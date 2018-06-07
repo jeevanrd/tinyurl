@@ -6,10 +6,10 @@
 - Set GOPATH and GOROOT environment variables
 
 ### How to start service?
-- go run main.go
+go run main.go
 
 ### How to run unit tests?
-- ginkgo -r
+ginkgo -r
 
 ### APIs Available
 - GET API
