@@ -1,5 +1,5 @@
 # tinyurl
-Service to create tinyurl
+Service to generate tinyurl
 
 ## Prerequisites:
 - Install golang
