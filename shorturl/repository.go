@@ -3,6 +3,7 @@ package shorturl
 import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"encoding/base64"
 )
 
 const (
@@ -21,7 +22,7 @@ type Repository interface {
 
 func (r *repository) Create(entry UrlEntry) (UrlEntry, error) {
 	entry.ID = bson.NewObjectId()
-	entry.ShortUrl = entry.ID.Hex()
+	entry.ShortUrl = base64.StdEncoding.EncodeToString([]byte(entry.ID))
 	err := r.Db.C(COLLECTION).Insert(&entry)
 	return entry,err
 }
