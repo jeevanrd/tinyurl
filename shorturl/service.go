@@ -9,6 +9,9 @@ import (
 var longUrlMap = new(sync.Map)
 var shortUrlMap = new(sync.Map)
 
+const (
+	tinyurlhosturi = "http://localhost:8000/tinyurl/"
+)
 type service struct {
 	Repo Repository
 	RedisClient utils.RedisClient
@@ -47,7 +50,7 @@ func (s *service) Create(entry UrlEntry) (CreateResponse,error) {
 	} else {
 		created = tObj.(UrlEntry)
 	}
-	return CreateResponse{LongUrl:created.LongUrl, ShortUrl:created.ShortUrl},nil
+	return CreateResponse{LongUrl:created.LongUrl, ShortUrl:tinyurlhosturi + created.ShortUrl},nil
 }
 
 func (s *service) Get(shortUrl string) (CreateResponse,error) {
@@ -64,7 +67,7 @@ func (s *service) Get(shortUrl string) (CreateResponse,error) {
 	} else {
 		entry = tObj.(UrlEntry)
 	}
-	return CreateResponse{LongUrl:entry.LongUrl, ShortUrl:entry.ShortUrl},nil
+	return CreateResponse{LongUrl:entry.LongUrl, ShortUrl:tinyurlhosturi+entry.ShortUrl},nil
 }
 
 
