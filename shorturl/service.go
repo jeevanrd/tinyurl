@@ -20,12 +20,12 @@ type Service interface {
 }
 
 type ErrorMsg struct {
-	Message string
+	Message string `json:"message,omitempty"`
 }
 
 type CreateResponse struct {
-	ShortUrl string
-	LongUrl string
+	ShortUrl string `json:"shortUrl"`
+	LongUrl string `json:"longUrl"`
 	ErrorMsg
 }
 

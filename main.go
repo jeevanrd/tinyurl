@@ -10,34 +10,59 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	"fmt"
 	"os"
+	"io/ioutil"
+	"encoding/json"
+	"strconv"
 )
 
-func main() {
-	uri := "mongodb://localhost:27017/"
-	dbName := "urls"
-	port := "3000"
+const (
+	defaultPort = 8090
+)
+type Config struct {
+	ApiPort string	`json:"api_port"`
+	DbUri	string 	`json:"db_uri"`
+	DbName	string	`json:"db_name"`
+}
 
-	fmt.Println(1)
-	dbObj,err := utils.Connect(uri, dbName)
-	fmt.Println(1)
-	if(err !=nil) {
-		log.Debug("Mongo error","unable to connect to mongo",err.Error())
+func main() {
+	pwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	fmt.Println(1)
+	jsonFile, err := ioutil.ReadFile(pwd + "/config.json")
+	if err != nil {
+		fmt.Println("Error opening JSON file:")
+		os.Exit(1)
+	}
+
+	var config Config
+	err = json.Unmarshal(jsonFile, &config)
+
+	if err != nil {
+		fmt.Print("Error:", err)
+	}
+
+	dbObj,err := utils.Connect(config.DbUri, config.DbName)
+	if(err !=nil) {
+		log.Debug("Mongo error","unable to connect to mongo",err.Error())
+		os.Exit(0)
+	}
+
 	r := mux.NewRouter()
 	ctx := context.Background()
-	fmt.Println(2)
 
 	repo := shorturl.NewRepository(dbObj)
 	rClient := utils.NewRedisClient()
-	fmt.Println(3)
 	sService := shorturl.NewService(repo, rClient)
-
 
 	var logger kitlog.Logger
 	logger = kitlog.NewJSONLogger(os.Stdout)
 
 	router := shorturl.MakeHandler(r, logger, ctx, sService)
-	http.ListenAndServe(":"+port, router)
+	if(config.ApiPort == "") {
+		config.ApiPort = strconv.Itoa(defaultPort)
+	}
+	http.ListenAndServe(":"+config.ApiPort, router)
 }
