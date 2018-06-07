@@ -1,10 +1,20 @@
 # tinyurl
+Service to create tinyurl
 
 ## Prerequisites:
 - Install golang
 - Install MongoDb
 - Set GOPATH and GOROOT environment variables
 
+## How to install dependencies
+Install godep tool
+```
+go get github.com/tools/godep
+```
+To install all project dependencies
+```
+godep restore
+```
 ### How to start service?
 go run main.go
 
