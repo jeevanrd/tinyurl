@@ -5,13 +5,13 @@
 - Install MongoDb
 - Set GOPATH and GOROOT environment variables
 
-# How to start service?
+### How to start service?
 - go run main.go
 
-# How to run unit tests?
+### How to run unit tests?
 - ginkgo -r
 
-# APIs Available
+### APIs Available
 - GET API
 
 ```
