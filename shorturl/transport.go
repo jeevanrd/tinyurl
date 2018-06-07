@@ -9,6 +9,7 @@ import (
 	"tiny_url/utils"
 	"encoding/json"
 	"strings"
+	"fmt"
 )
 
 type GetUrlRequest struct {
@@ -72,10 +73,13 @@ func decodeCreateRequest(_ context.Context, r *http.Request) (interface{}, error
 
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
+	fmt.Println(21)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	switch err {
 	case utils.ErrInvalidArgument,utils.JsonParseError,utils.ErrBadRoute:
 		w.WriteHeader(http.StatusBadRequest)
+	case utils.ErrNotFound:
+		w.WriteHeader(http.StatusNotFound)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 	}
@@ -85,6 +89,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 }
 
 func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	fmt.Println(31)
 	if e, ok := response.(errorer); ok && e.error() != nil {
 		encodeError(ctx, e.error(), w)
 		return nil

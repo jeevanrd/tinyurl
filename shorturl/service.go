@@ -2,8 +2,13 @@ package shorturl
 
 import (
 	"tiny_url/utils"
+	"sync"
+	"strings"
 	"fmt"
 )
+
+var longUrlMap = new(sync.Map)
+var shortUrlMap = new(sync.Map)
 
 type service struct {
 	Repo Repository
@@ -16,7 +21,7 @@ type Service interface {
 }
 
 type ErrorMsg struct {
-	message string
+	Message string
 }
 
 type CreateResponse struct {
@@ -26,23 +31,47 @@ type CreateResponse struct {
 }
 
 func (s *service) Create(entry UrlEntry) (CreateResponse,error) {
-	created,err := s.Repo.FindByLongurl(entry.LongUrl)
-	if(err != nil) {
-		fmt.Println(err.Error())
-	}
-	if(created.LongUrl == "") {
-		created,err = s.Repo.Create(entry)
-		if(err != nil) {
-			return CreateResponse{}, err
+	var created UrlEntry
+	var err error
+
+	tObj, ok := longUrlMap.Load(entry.LongUrl)
+	if !ok {
+		created,err = s.Repo.FindByLongurl(entry.LongUrl)
+		if(created.LongUrl == "" || (err != nil && strings.Trim(err.Error(), "") == "not found")) {
+			created, err = s.Repo.Create(entry)
+			if (err != nil) {
+				return CreateResponse{}, err
+			}
 		}
+		longUrlMap.Store(entry.LongUrl, created)
+		shortUrlMap.Store(created.ShortUrl,created)
+	} else {
+		created = tObj.(UrlEntry)
 	}
 	return CreateResponse{LongUrl:created.LongUrl, ShortUrl:created.ShortUrl},nil
 }
 
 func (s *service) Get(shortUrl string) (CreateResponse,error) {
-	entry,err := s.Repo.Get(shortUrl)
-	if(err != nil || entry.ShortUrl == "") {
-		return CreateResponse{},utils.ErrNotFound
+	var entry UrlEntry
+	var err error
+
+	fmt.Println(1)
+	tObj, ok := shortUrlMap.Load(shortUrl)
+	if !ok {
+		fmt.Println(1)
+		entry,err = s.Repo.Get(shortUrl)
+		fmt.Println(1)
+		fmt.Println(1123)
+		if(err != nil || entry.ShortUrl == "") {
+			fmt.Println(1123)
+			fmt.Println(utils.ErrNotFound.Error())
+			fmt.Println(1123)
+			return CreateResponse{ErrorMsg:ErrorMsg{Message:utils.ErrNotFound.Error()}},utils.ErrNotFound
+		}
+		fmt.Println(1)
+		shortUrlMap.Store(entry.ShortUrl, entry)
+	} else {
+		entry = tObj.(UrlEntry)
 	}
 	return CreateResponse{LongUrl:entry.LongUrl, ShortUrl:entry.ShortUrl},nil
 }

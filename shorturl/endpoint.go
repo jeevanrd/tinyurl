@@ -3,6 +3,7 @@ package shorturl
 import (
 	"github.com/go-kit/kit/endpoint"
 	"context"
+	"fmt"
 )
 
 
@@ -22,6 +23,10 @@ func makeGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetUrlRequest)
 		c, err := s.Get(req.ShortUrl)
+		fmt.Println("********")
+		fmt.Println(c)
+		fmt.Println(err)
+		fmt.Println("********")
 		return c, err
 	}
 }

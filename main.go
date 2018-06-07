@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/common/log"
 	kitlog "github.com/go-kit/kit/log"
 	"fmt"
+	"os"
 )
 
 func main() {
@@ -34,7 +35,9 @@ func main() {
 	sService := shorturl.NewService(repo, rClient)
 
 
-	var Logger kitlog.Logger
-	router := shorturl.MakeHandler(r, Logger, ctx, sService)
+	var logger kitlog.Logger
+	logger = kitlog.NewJSONLogger(os.Stdout)
+
+	router := shorturl.MakeHandler(r, logger, ctx, sService)
 	http.ListenAndServe(":"+port, router)
 }
