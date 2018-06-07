@@ -4,7 +4,6 @@ import (
 	"tiny_url/utils"
 	"sync"
 	"strings"
-	"fmt"
 )
 
 var longUrlMap = new(sync.Map)
@@ -55,20 +54,12 @@ func (s *service) Get(shortUrl string) (CreateResponse,error) {
 	var entry UrlEntry
 	var err error
 
-	fmt.Println(1)
 	tObj, ok := shortUrlMap.Load(shortUrl)
 	if !ok {
-		fmt.Println(1)
 		entry,err = s.Repo.Get(shortUrl)
-		fmt.Println(1)
-		fmt.Println(1123)
 		if(err != nil || entry.ShortUrl == "") {
-			fmt.Println(1123)
-			fmt.Println(utils.ErrNotFound.Error())
-			fmt.Println(1123)
 			return CreateResponse{ErrorMsg:ErrorMsg{Message:utils.ErrNotFound.Error()}},utils.ErrNotFound
 		}
-		fmt.Println(1)
 		shortUrlMap.Store(entry.ShortUrl, entry)
 	} else {
 		entry = tObj.(UrlEntry)
