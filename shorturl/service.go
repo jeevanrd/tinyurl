@@ -10,6 +10,9 @@ var longUrlMap = new(sync.Map)
 var shortUrlMap = new(sync.Map)
 
 const (
+	//Uable to retrieve the request with host url when running locally.
+	//It works when running on any external server. but for now hardcoding this. 
+	//Need to refactor this
 	tinyurlhosturi = "http://localhost:8000/tinyurl/"
 )
 type service struct {
